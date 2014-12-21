@@ -80,7 +80,7 @@ static tOrderNode Nodes[] =
     {"time","Show Local Time",PrintTime,&Nodes[5]},
     {"quit","exit program",SystemQuit,&Nodes[6]},
     {"history","show menu order history",(intVoid)PrintHisList,&Nodes[7]},
-    {"color","change text color",(intVoid)SetTextColor,NULL}
+    {"color","Color x;change text color(x = 1:red;2:green;3:blue;4:yellow)",(intVoid)SetTextColor,NULL}
 };
 
 
@@ -229,17 +229,9 @@ int PrintTime()
 
 int PrintHelpContent()
 {
+    printf("------------------------------\n");
     ShowAllCmd(Nodes);
-//    printf("*********************Menu Instructions:*************************\n");
-//    printf("    QUIT : Return to shell.\n");
-//    printf("    HELP : Guide of this Menu\n");
-//    printf("    HISTORY : Order Input History\n");
-//    printf("    COLOR N : change text color(N= 0:Clear;1:red;2:green;3:blue;4:yellow)\n");
-//    printf("    TIME : Show Local time\n");
-//    printf("    VERSION : Show menu software version\n");
-//    printf("    CLEAR : Clear the screen\n");
-//    printf("    RESET : Clear all status and history and restart\n");
-//    printf("****************************************************************\n");
+    printf("------------------------------\n");
     return 0;
 }
 int SystemQuit()
@@ -271,7 +263,8 @@ int PrintVersion()
      return 0;
 }
 
-char *strlwr(char *s)          //Convert to lower
+char *strlwr(char *s)          
+//Convert to lower
 {
     char *str;
     str = s;
@@ -286,7 +279,8 @@ char *strlwr(char *s)          //Convert to lower
     return s;
 }
 
-int ScanArgument(char *argu)   // Scan for 1 argument, If more than 1 clear buffer and return 1, if non return -1, if only 1 argument renturn 0 
+int ScanArgument(char *argu)  
+ // Scan for 1 argument, If more than 1 clear buffer and return 1, if non return -1, if only 1 argument renturn 0 
 {
     int flag = 0;
     char c;
