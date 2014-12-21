@@ -38,8 +38,16 @@
 #include <stdlib.h>
 #include <time.h>
 #include "order_list.h"
+#include "orderStructure.h"
 
 #define VERSION "Version - 0.4 , UPATED AT 2014/12/6 \n"
+
+
+typedef int (*intVoid) (void);
+typedef void (*voidchar) (char *);
+typedef void (*voidvoid) (void);
+typedef void (*voidhis) (history_l *, histroy_n *);
+
 
 
 char *strlwr(char *s)          //Convert to lower
@@ -105,14 +113,15 @@ void SetTextColor(char *argu)
     }
 }
 
-void PrintTime()
+int PrintTime()
 {
     time_t sec = time(NULL);
     struct tm t = *localtime(&sec);
     printf("Local time is(hh/mm/ss) : %02d:%02d:%02d\n",t.tm_hour,t.tm_min,t.tm_sec);
+    return 0;
 }
 
-void PrintHelpContent()
+int PrintHelpContent()
 {
 
     printf("*********************Menu Instructions:*************************\n");
@@ -125,13 +134,14 @@ void PrintHelpContent()
     printf("    CLEAR : Clear the screen\n");
     printf("    RESET : Clear all status and history and restart\n");
     printf("****************************************************************\n");
-
+    return 0;
 }
 
-void ClearScreen()
+int ClearScreen()
 {
     printf("\033[2J");
-    printf("\033[1;1H");   
+    printf("\033[1;1H");
+    return 0;   
 }
 
 void RestartProgram(history_l *li,history_n *n)
@@ -142,6 +152,25 @@ void RestartProgram(history_l *li,history_n *n)
     ResetHisList(li);
     HistoryListInitial(li,n);
 }
+
+int PrintVersion()
+{
+     printf(VERSION);
+     return 0;
+}
+
+//orderlist 1.name 2.desc 3.handler 4.next;
+static tOrderNode Nodes[]{
+    {"help","Get help information",PrintHelpContent,&Nodes[1]}
+    {"clear","Clear the screen",ClearScreen, &Nodes[2]},
+    {"reset","Clear all status",(intVoid) RestartProgram, &Nodes[3]},
+    {"version","Show menu software version",PrintVersion,&Nodes[4]},
+    {"time","Show Local Time",PrintTime,&Nodes[5]},
+    {"quit","exit program",SystemQuit,&Nodes[6]},
+    {"history","show menu order history",PrintHisList,&Nodes[7]},
+    {"color","change text color",SetTextColor,NULL}
+}
+
 
 int main()
 {
