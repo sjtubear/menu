@@ -7,10 +7,10 @@ typedef struct orderNode{
     char *name;
     char *desc;
     int (*handler)();
-    orderNode* next;
+    struct orderNode* next;
 }tOrderNode;
 
 
 tOrderNode *FindCmd(tOrderNode *head,char *cmd);
 
-int ShowAllCmd(*tOrderNode *head);
+int ShowAllCmd(tOrderNode *head);

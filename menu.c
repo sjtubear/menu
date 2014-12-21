@@ -31,7 +31,19 @@
 /*
         Author:Wang TianHao
         Date: 06/12/14 00:00
-        version 0.4 Add reset
+        version 0.4 Add rese
+    char *str;
+    str = s;
+    while(*str != '\0')
+    {
+        if(*str >= 'A' && *str <= 'Z') 
+        {
+            *str += 'a'-'A';
+        }
+    str++;
+    }
+    return s;
+}
 */
 
 #include <stdio.h>
@@ -46,123 +58,22 @@
 typedef int (*intVoid) (void);
 typedef void (*voidchar) (char *);
 typedef void (*voidvoid) (void);
-typedef void (*voidhis) (history_l *, histroy_n *);
+typedef void (*voidhis) (history_l *, history_n *);
 typedef void (*voidhisl) (history_l *);
 
-
-char *strlwr(char *s)          //Convert to lower
-{
-    char *str;
-    str = s;
-    while(*str != '\0')
-    {
-        if(*str >= 'A' && *str <= 'Z') 
-        {
-            *str += 'a'-'A';
-        }
-    str++;
-    }
-    return s;
-}
-
-int ScanArgument(char *argu)   // Scan for 1 argument, If more than 1 clear buffer and return 1, if non return -1, if only 1 argument renturn 0 
-{
-    int flag = 0;
-    char c;
-    if(((c = getchar()) != '\n' )&& c != EOF)
-    {
-        scanf("%s",argu);
-	while(( c = getchar()) != '\n' && c!= EOF)
-        {
-            flag = 1;
-        }
-    }
-    else
-    {
-        flag=-1;
-    }
-    return flag;
-}
-
-void SetTextColor(char *argu)
-{
-       
-    if(strcmp("1",argu)==0)
-    {
-        printf("\033[;31m");
-    }
-    else if(strcmp("0",argu)==0)
-    {
-        printf("\033[0m");
-    }
-    else if(strcmp("2",argu)==0)
-    {
-        printf("\033[;32m");
-    }
-    else if(strcmp("3",argu)==0)
-    {
-        printf("\033[;34m");
-    }
-    else if(strcmp("4",argu)==0)
-    {
-        printf("\033[33m");
-    }
-    else
-    {
-        printf("Argument Illegal!\n");
-    }
-}
-
-int PrintTime()
-{
-    time_t sec = time(NULL);
-    struct tm t = *localtime(&sec);
-    printf("Local time is(hh/mm/ss) : %02d:%02d:%02d\n",t.tm_hour,t.tm_min,t.tm_sec);
-    return 0;
-}
-
-int PrintHelpContent()
-{
-    ShowAllCmd(Nodes);
-//    printf("*********************Menu Instructions:*************************\n");
-//    printf("    QUIT : Return to shell.\n");
-//    printf("    HELP : Guide of this Menu\n");
-//    printf("    HISTORY : Order Input History\n");
-//    printf("    COLOR N : change text color(N= 0:Clear;1:red;2:green;3:blue;4:yellow)\n");
-//    printf("    TIME : Show Local time\n");
-//    printf("    VERSION : Show menu software version\n");
-//    printf("    CLEAR : Clear the screen\n");
-//    printf("    RESET : Clear all status and history and restart\n");
-//    printf("****************************************************************\n");
-    return 0;
-}
-
-int ClearScreen()
-{
-    printf("\033[2J");
-    printf("\033[1;1H");
-    return 0;   
-}
-
-void RestartProgram(history_l *li,history_n *n)
-{
-    ClearScreen();
-    SetTextColor("4");
-    PrintHelpContent();
-    ResetHisList(li);
-    HistoryListInitial(li,n);
-}
-
-int PrintVersion()
-{
-     printf(VERSION);
-     return 0;
-}
+int ClearScreen();
+int PrintHelpContent();
+int PrintVersion();
+int PrintTime();
+int SystemQuit();
+void SetTextColor(char *argu);
+void RestartProgram(history_l *li,history_n *n);
+char* strlwr(char*);
 
 //orderlist 1.name 2.desc 3.handler 4.next;
 static tOrderNode Nodes[] = 
 {
-    {"help","Get help information",PrintHelpContent,&Nodes[1]}
+    {"help","Get help information",PrintHelpContent,&Nodes[1]},
     {"clear","Clear the screen",ClearScreen, &Nodes[2]},
     {"reset","Clear all status",(intVoid) RestartProgram, &Nodes[3]},
     {"version","Show menu software version",PrintVersion,&Nodes[4]},
@@ -170,7 +81,7 @@ static tOrderNode Nodes[] =
     {"quit","exit program",SystemQuit,&Nodes[6]},
     {"history","show menu order history",(intVoid)PrintHisList,&Nodes[7]},
     {"color","change text color",(intVoid)SetTextColor,NULL}
-}
+};
 
 
 int main()
@@ -214,11 +125,11 @@ int main()
             {
                 (voidhisl)temp->handler(orderList);
             }
-            else if(strcmp(order,"color")
+            else if(strcmp(order,"color")==0)
             {
                 (voidchar)temp->handler(argument);
             }
-            else if(strcmp(order,"reset")
+            else if(strcmp(order,"reset")==0)
             {
                 (voidhis)temp->handler(orderList,startNode);
             }
@@ -277,4 +188,119 @@ int main()
     //        printf("Please Input HELP for instruction!\n");
     //    }
     }
+}
+
+void SetTextColor(char *argu)
+{
+       
+    if(strcmp("1",argu)==0)
+    {
+        printf("\033[;31m");
+    }
+    else if(strcmp("0",argu)==0)
+    {
+        printf("\033[0m");
+    }
+    else if(strcmp("2",argu)==0)
+    {
+        printf("\033[;32m");
+    }
+    else if(strcmp("3",argu)==0)
+    {
+        printf("\033[;34m");
+    }
+    else if(strcmp("4",argu)==0)
+    {
+        printf("\033[33m");
+    }
+    else
+    {
+        printf("Argument Illegal!\n");
+    }
+}
+
+int PrintTime()
+{
+    time_t sec = time(NULL);
+    struct tm t = *localtime(&sec);
+    printf("Local time is(hh/mm/ss) : %02d:%02d:%02d\n",t.tm_hour,t.tm_min,t.tm_sec);
+    return 0;
+}
+
+int PrintHelpContent()
+{
+    ShowAllCmd(Nodes);
+//    printf("*********************Menu Instructions:*************************\n");
+//    printf("    QUIT : Return to shell.\n");
+//    printf("    HELP : Guide of this Menu\n");
+//    printf("    HISTORY : Order Input History\n");
+//    printf("    COLOR N : change text color(N= 0:Clear;1:red;2:green;3:blue;4:yellow)\n");
+//    printf("    TIME : Show Local time\n");
+//    printf("    VERSION : Show menu software version\n");
+//    printf("    CLEAR : Clear the screen\n");
+//    printf("    RESET : Clear all status and history and restart\n");
+//    printf("****************************************************************\n");
+    return 0;
+}
+int SystemQuit()
+{
+	SetTextColor("0");
+	ClearScreen();
+    exit(0);
+    return 0;
+}
+int ClearScreen()
+{
+    printf("\033[2J");
+    printf("\033[1;1H");
+    return 0;   
+}
+
+void RestartProgram(history_l *li,history_n *n)
+{
+    ClearScreen();
+    SetTextColor("4");
+    PrintHelpContent();
+    ResetHisList(li);
+    HistoryListInitial(li,n);
+}
+
+int PrintVersion()
+{
+     printf(VERSION);
+     return 0;
+}
+
+char *strlwr(char *s)          //Convert to lower
+{
+    char *str;
+    str = s;
+    while(*str != '\0')
+    {
+        if(*str >= 'A' && *str <= 'Z') 
+        {
+            *str += 'a'-'A';
+        }
+    str++;
+    }
+    return s;
+}
+
+int ScanArgument(char *argu)   // Scan for 1 argument, If more than 1 clear buffer and return 1, if non return -1, if only 1 argument renturn 0 
+{
+    int flag = 0;
+    char c;
+    if(((c = getchar()) != '\n' )&& c != EOF)
+    {
+        scanf("%s",argu);
+	while(( c = getchar()) != '\n' && c!= EOF)
+        {
+            flag = 1;
+        }
+    }
+    else
+    {
+        flag=-1;
+    }
+    return flag;
 }

@@ -20,7 +20,7 @@ int ShowAllCmd(tOrderNode* head)
      tOrderNode *temp = head;
      while(temp!=NULL)
      {
-         printf("%s :%d \n", temp->name, temp->desc);
+         printf("%s :%s \n", temp->name, temp->desc);
          temp = temp->next;
      }
      return 0;
