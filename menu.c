@@ -41,13 +41,13 @@
 #include "orderStructure.h"
 
 #define VERSION "Version - 0.4 , UPATED AT 2014/12/6 \n"
-
+#define CMD_MAX_LENGTH 128
 
 typedef int (*intVoid) (void);
 typedef void (*voidchar) (char *);
 typedef void (*voidvoid) (void);
 typedef void (*voidhis) (history_l *, histroy_n *);
-
+typedef void (*voidhisl) (history_l *);
 
 
 char *strlwr(char *s)          //Convert to lower
@@ -123,17 +123,17 @@ int PrintTime()
 
 int PrintHelpContent()
 {
-
-    printf("*********************Menu Instructions:*************************\n");
-    printf("    QUIT : Return to shell.\n");
-    printf("    HELP : Guide of this Menu\n");
-    printf("    HISTORY : Order Input History\n");
-    printf("    COLOR N : change text color(N= 0:Clear;1:red;2:green;3:blue;4:yellow)\n");
-    printf("    TIME : Show Local time\n");
-    printf("    VERSION : Show menu software version\n");
-    printf("    CLEAR : Clear the screen\n");
-    printf("    RESET : Clear all status and history and restart\n");
-    printf("****************************************************************\n");
+    ShowAllCmd(Nodes);
+//    printf("*********************Menu Instructions:*************************\n");
+//    printf("    QUIT : Return to shell.\n");
+//    printf("    HELP : Guide of this Menu\n");
+//    printf("    HISTORY : Order Input History\n");
+//    printf("    COLOR N : change text color(N= 0:Clear;1:red;2:green;3:blue;4:yellow)\n");
+//    printf("    TIME : Show Local time\n");
+//    printf("    VERSION : Show menu software version\n");
+//    printf("    CLEAR : Clear the screen\n");
+//    printf("    RESET : Clear all status and history and restart\n");
+//    printf("****************************************************************\n");
     return 0;
 }
 
@@ -160,26 +160,29 @@ int PrintVersion()
 }
 
 //orderlist 1.name 2.desc 3.handler 4.next;
-static tOrderNode Nodes[]{
+static tOrderNode Nodes[] = 
+{
     {"help","Get help information",PrintHelpContent,&Nodes[1]}
     {"clear","Clear the screen",ClearScreen, &Nodes[2]},
     {"reset","Clear all status",(intVoid) RestartProgram, &Nodes[3]},
     {"version","Show menu software version",PrintVersion,&Nodes[4]},
     {"time","Show Local Time",PrintTime,&Nodes[5]},
     {"quit","exit program",SystemQuit,&Nodes[6]},
-    {"history","show menu order history",PrintHisList,&Nodes[7]},
-    {"color","change text color",SetTextColor,NULL}
+    {"history","show menu order history",(intVoid)PrintHisList,&Nodes[7]},
+    {"color","change text color",(intVoid)SetTextColor,NULL}
 }
 
 
 int main()
 {
     
-    char order[128];                                        // Order saved in this Array
-    char argument[128];                                     // Order's Argument.
-    char orderHistory[10][128];                             // History Orders;
-    char start[128]={"-------ORDER START---------"};
-    
+    char order[CMD_MAX_LENGTH];
+    // Order saved in this Array
+    char argument[CMD_MAX_LENGTH];
+    // Order's Argument.
+    char start[CMD_MAX_LENGTH]={"-------ORDER START---------"};
+    tOrderNode *temp;    
+
     history_l *orderList = malloc(sizeof(history_l));       //Create history list;
     history_n *startNode = malloc(sizeof(history_n));
 
@@ -191,57 +194,87 @@ int main()
     PrintHelpContent();
     while(1)                                                
     {
-        printf(">>>");                                      // Input Indication
-
-        scanf("%s",order);                                  // Read Order
+          
+        printf(">>>");
+        // Input Indication
+        scanf("%s",order);
+        // Read Order
         strlwr(order);
-        history_n *temp = malloc(sizeof(history_n));
-        HistoryNodeInitial(temp,order);
-        AddHistoryNode(orderList,temp);        
+        //switch all orders to lower char
+        tOrderNode *temp = FindCmd(Nodes,order);
+        //Get the cmd node pointer
+        int arg;
+        arg = ScanArgument(argument);
+        if(temp != NULL)
+        {
+            history_n *tempN = malloc(sizeof(history_n));
+            HistoryNodeInitial(tempN,order);
+            AddHistoryNode(orderList,tempN);
+            if(strcmp(order,"history")==0)
+            {
+                (voidhisl)temp->handler(orderList);
+            }
+            else if(strcmp(order,"color")
+            {
+                (voidchar)temp->handler(argument);
+            }
+            else if(strcmp(order,"reset")
+            {
+                (voidhis)temp->handler(orderList,startNode);
+            }
+            else
+            {
+                temp->handler();
+            }
+        }
+        else
+        {
+            printf("No such CMD, please type help for instruction \n");
+        }             
 
-        int i;
-        i=ScanArgument(argument);
-	
-        if (i != -1) printf("%d and %s \n",i,argument);
+    //    int i;
+    //    i=ScanArgument(argument);
+    //    
+    //    if (i != -1) printf("%d and %s \n",i,argument);
 
-        if(strcmp("quit",order)==0)
-        {
-            SetTextColor("0");
-            ClearScreen();
-            exit(0);
-        }
-        else if(strcmp("help",order)==0)
-        {
-            PrintHelpContent();
-        }
-        else if(strcmp("history",order)==0)
-        {
-            PrintHisList(orderList);
-        }
-        else if(strcmp("color",order)==0)
-        {
-            SetTextColor(argument);   
-        }
-        else if(strcmp("time",order)==0)
-        {
-            PrintTime();
-        }
-	else if(strcmp("version",order)==0)
-        {
-            printf(VERSION);
-        }
-        else if(strcmp("clear",order)==0)
-        {
-            ClearScreen();
-        }
-        else if(strcmp("reset",order)==0)
-        {
-            RestartProgram(orderList,startNode);
-        }       
-        else 
-        {
-            printf("Unkown Order : %s \n",order);
-            printf("Please Input HELP for instruction!\n");
-        }
+    //    if(strcmp("quit",order)==0)
+    //    {
+    //        SetTextColor("0");
+    //        ClearScreen();
+    //        exit(0);
+    //    }
+    //    else if(strcmp("help",order)==0)
+    //    {
+    //        PrintHelpContent();
+    //    }
+    //    else if(strcmp("history",order)==0)
+    //    {
+    //        PrintHisList(orderList);
+    //    }
+    //    else if(strcmp("color",order)==0)
+    //    {
+    //        SetTextColor(argument);   
+    //    }
+    //    else if(strcmp("time",order)==0)
+    //    {
+    //        PrintTime();
+    //    }
+    //    else if(strcmp("version",order)==0)
+    //    {
+    //        printf(VERSION);
+    //    }
+    //    else if(strcmp("clear",order)==0)
+    //    {
+    //        ClearScreen();
+    //    }
+    //    else if(strcmp("reset",order)==0)
+    //    {
+    //        RestartProgram(orderList,startNode);
+    //    }       
+    //    else 
+    //    {
+    //        printf("Unkown Order : %s \n",order);
+    //        printf("Please Input HELP for instruction!\n");
+    //    }
     }
 }
