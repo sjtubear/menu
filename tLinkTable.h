@@ -25,7 +25,7 @@ tLinkTable * CreateLink();
 /*
 Delete Link
 */
-int DeleteLink(tLinkTable * );
+int DeleteLink(tLinkTable *table );
 
 /*Add Node*/
 int AddLinkNode(tLinkTable* table,tLinkNode *node);
