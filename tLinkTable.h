@@ -1,0 +1,36 @@
+#ifndef _LINK_TABLE_
+#define _LINK_TABLE_
+
+#include <stdio.h>
+#include <stdlib.h>
+
+//Node datastruct
+typedef struct LinkNode{
+    struct LinkNode* next;
+}tLinkNode;
+
+//table datastruct
+typedef struct LinkTable{
+   tLinkNode *head;
+   tLinkNode *tail;
+   int sumNode;
+}tLinkTable;
+
+
+/*
+Create link table
+*/
+tLinkTable * CreateLink();
+
+/*
+Delete Link
+*/
+int DeleteLink(tLinkTable * );
+
+/*Add Node*/
+int AddLinkNode(tLinkTable* table,tLinkNode *node);
+
+/*Delete Node*/
+int DelLinkNode(tLinkTable* table,tLinkNode *node);
+
+#endif
