@@ -50,9 +50,10 @@
 #include <stdlib.h>
 #include <time.h>
 #include "order_list.h"
-#include "orderStructure.h"
+//#include "orderStructure.h"
+#include "tLinkTable.h"
 
-#define VERSION "Version - 0.4 , UPATED AT 2014/12/6 \n"
+#define VERSION "Version - 1.2 , UPATED AT 2014/12/27 \n"
 #define CMD_MAX_LENGTH 128
 
 typedef int (*intVoid) (void);
@@ -70,7 +71,75 @@ void SetTextColor(char *argu);
 void RestartProgram(history_l *li,history_n *n);
 char* strlwr(char*);
 
+typedef struct dataNode{
+    tLinkNode *next;
+    char * name;
+    char * desc;
+    int (*handler)(); 
+}tDataNode;
+
+tDataNode * FindCmd(tLinkTable *table, char *cmd)
+{
+    tDataNode *temp = (tDataNode *)table->head;
+   // printf("%s     %s\n",temp->name,cmd);
+    while(strcmp(temp->name,cmd))
+    {
+     //   printf("Come here!\n");
+        if(temp->next == NULL)
+        {
+            return NULL;
+        }
+        else
+        {
+            temp = (tDataNode *)temp->next;
+        }
+    }
+    return temp;
+}
+
+int ShowAllCmd(tLinkTable* table)
+{
+    tDataNode *temp = (tDataNode *)table->head;
+    while(temp != NULL)
+    {
+        printf("%s : %s\n",temp->name,temp->desc);
+        temp = (tDataNode *)temp->next;
+    }
+    return 0;
+}
+
+int InitialLink(tLinkTable ** table)
+{
+    *table = CreateLink();
+    tDataNode *temp = malloc(sizeof(tDataNode));
+    temp->name = "quit";
+    temp->desc = "exit program";
+    temp->handler = SystemQuit;
+    AddLinkNode(*table, (tLinkNode *)temp);
+    temp = malloc(sizeof(tDataNode));
+    temp->name = "clear";
+    temp->desc = "Clear the screen";
+    temp->handler = ClearScreen;
+    AddLinkNode(*table, (tLinkNode *)temp);
+    temp = malloc(sizeof(tDataNode));
+    temp->name = "help";
+    temp->desc = "Get help information";
+    temp->handler = PrintHelpContent;
+    AddLinkNode(*table, (tLinkNode *)temp);
+    temp = malloc(sizeof(tDataNode));
+    temp->name = "version";
+    temp->desc = "Show menu software version";
+    temp->handler = PrintVersion;
+    AddLinkNode(*table,(tLinkNode*)temp);
+    temp = malloc(sizeof(tDataNode));
+    temp->name = "time";
+    temp->desc = "Show Time";
+    temp->handler = PrintTime;
+    AddLinkNode(*table,(tLinkNode*)temp);
+}
+
 //orderlist 1.name 2.desc 3.handler 4.next;
+/*
 static tOrderNode Nodes[] = 
 {
     {"help","Get help information",PrintHelpContent,&Nodes[1]},
@@ -82,17 +151,20 @@ static tOrderNode Nodes[] =
     {"history","show menu order history",(intVoid)PrintHisList,&Nodes[7]},
     {"color","Color x;change text color(x = 1:red;2:green;3:blue;4:yellow)",(intVoid)SetTextColor,NULL}
 };
+*/
 
+tLinkTable * head = NULL;
 
 int main()
 {
-    
+ //   head = CreatLink();
+    InitialLink(&head);
     char order[CMD_MAX_LENGTH];
     // Order saved in this Array
     char argument[CMD_MAX_LENGTH];
     // Order's Argument.
     char start[CMD_MAX_LENGTH]={"-------ORDER START---------"};
-    tOrderNode *temp;    
+    tDataNode *temp;    
 
     history_l *orderList = malloc(sizeof(history_l));       //Create history list;
     history_n *startNode = malloc(sizeof(history_n));
@@ -112,7 +184,7 @@ int main()
         // Read Order
         strlwr(order);
         //switch all orders to lower char
-        tOrderNode *temp = FindCmd(Nodes,order);
+        tDataNode *temp = FindCmd(head,order);
         //Get the cmd node pointer
         int arg;
         arg = ScanArgument(argument);
@@ -121,7 +193,7 @@ int main()
             history_n *tempN = malloc(sizeof(history_n));
             HistoryNodeInitial(tempN,order);
             AddHistoryNode(orderList,tempN);
-            if(strcmp(order,"history")==0)
+          /*  if(strcmp(order,"history")==0)
             {
                 (voidhisl)temp->handler(orderList);
             }
@@ -136,7 +208,8 @@ int main()
             else
             {
                 temp->handler();
-            }
+            }*/
+            temp->handler();
         }
         else
         {
@@ -230,12 +303,13 @@ int PrintTime()
 int PrintHelpContent()
 {
     printf("------------------------------\n");
-    ShowAllCmd(Nodes);
+    ShowAllCmd(head);
     printf("------------------------------\n");
     return 0;
 }
 int SystemQuit()
 {
+     printf("!!\n");
 	SetTextColor("0");
 	ClearScreen();
     exit(0);

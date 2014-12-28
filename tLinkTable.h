@@ -16,6 +16,15 @@ typedef struct LinkTable{
    int sumNode;
 }tLinkTable;
 
+/*get head)
+*/
+tLinkNode *GetHeadNode(tLinkTable *table);
+
+/*
+
+*/
+tLinkNode *GetNextNode(tLinkTable *table,tLinkNode *node);
+
 
 /*
 Create link table

@@ -1,5 +1,29 @@
 #include "tLinkTable.h"
 
+/*Get head*/
+tLinkNode *GetHeadNode(tLinkTable *talbe)
+{
+    return talbe->head;
+}
+
+/*Get Next Node*/
+tLinkNode *GetNextNode(tLinkTable *table,tLinkNode *node)
+{
+    tLinkNode *temp = table->head;
+    while(temp != node)
+    {
+        if(temp->next == NULL)
+        {
+           temp = NULL;
+           break;
+        }
+        temp = temp->next;
+    }
+    return temp;
+}
+
+
+
 /*Create a blank link table*/
 tLinkTable *CreateLink()
 {
@@ -60,11 +84,11 @@ int DelLinkNode(tLinkTable *table, tLinkNode *node)
     if(temp == node)
     {
          table->head = temp->next;
-         if(sumNode == 1)
+         if(table->sumNode == 1)
          { 
              table->tail = table->head;
          }
-         sumNode -- ;
+         table->sumNode -- ;
          free(temp);
          return 0;
     }
